@@ -1,8 +1,14 @@
 ﻿using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
 using SturdyGuide;
 
-var kernel = KernelFactory.BuildKernel();
+await using var driver = DriverFactory.BuildDriver();
+var kernel = KernelFactory.BuildKernel(driver);
 var chatService = kernel.GetRequiredService<IChatCompletionService>();
+var promptSettings = new OpenAIPromptExecutionSettings
+{
+    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+};
 
 var chatHistory = new ChatHistory();
 do
@@ -13,7 +19,7 @@ do
         return;
 
     chatHistory.AddUserMessage(userInput);
-    var response = await chatService.GetChatMessageContentAsync(chatHistory);
+    var response = await chatService.GetChatMessageContentAsync(chatHistory, promptSettings, kernel);
     chatHistory.AddMessage(response.Role, response.Content ?? string.Empty);
 
     Console.WriteLine("Assistant > " + response);
