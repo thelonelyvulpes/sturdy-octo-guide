@@ -9,13 +9,16 @@ internal sealed class Config
     static Config()
     {
         ConfigValues = new Lazy<IConfigurationRoot>(() =>
-        {
-            var cb = new ConfigurationBuilder();
-            cb.AddUserSecrets<Config>();
-            return cb.Build();
-        }, LazyThreadSafetyMode.ExecutionAndPublication);
+                new ConfigurationBuilder()
+                    .AddUserSecrets<Config>()
+                    .AddJsonFile("./appsettings.json")
+                    .Build(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     public static string ApiKey => ConfigValues.Value["OAI:ApiKey"] ??
                                    throw new InvalidOperationException("secret for api key not loaded");
+
+    public static string ModelName => ConfigValues.Value["Model"] ??
+                                      throw new InvalidOperationException("'Model' missing from appsettings");
 }

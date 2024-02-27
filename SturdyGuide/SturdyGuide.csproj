@@ -15,4 +15,10 @@
         <PackageReference Include="Neo4j.Driver" Version="5.17.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>
