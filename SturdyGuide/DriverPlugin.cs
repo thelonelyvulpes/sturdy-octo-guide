@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using Microsoft.SemanticKernel;
 using Neo4j.Driver;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace SturdyGuide;
 
@@ -14,6 +14,6 @@ public class DriverPlugin(IDriver driver)
         var result = await driver.ExecutableQuery(query)
             .WithConfig(new QueryConfig(writeMode ? RoutingControl.Writers : RoutingControl.Readers, "neo4j"))
             .ExecuteAsync();
-        return JsonConvert.SerializeObject(result);
+        return JsonSerializer.Serialize(result);
     }
 }

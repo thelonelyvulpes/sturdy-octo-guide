@@ -8,12 +8,12 @@ dotnet --version
 
 Install packages from root dir
 ```shell
-dotnet restore
+dotnet restore .
 ```
 
 Register you OpenAI API key with [User secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-8.0&tabs=linux).
 ```shell
-cd SturdyGuide
+cd <PROJECT_ROOT>/SturdyGuide
 dotnet user-secrets set "OAI:ApiKey" "key here"
 ```
 this will be read a used from [Config.cs](./SturdyGuide/Config.cs)
