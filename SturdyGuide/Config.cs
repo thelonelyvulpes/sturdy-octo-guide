@@ -29,6 +29,6 @@ internal sealed class Config
     public static string Neo4jUser => ConfigValues.Value.GetSection("neo4j")["user"] ??
                                       throw new InvalidOperationException("secret for api key not loaded");
 
-    public static string Neo4jPassword => ConfigValues.Value.GetSection("neo4j")["password"] ??
+    public static string Neo4jPassword => ConfigValues.Value["neo4j:password"] ??
                                           throw new InvalidOperationException("secret for api key not loaded");
 }
