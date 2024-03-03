@@ -3,7 +3,9 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 using SturdyGuide;
 
 await using var driver = DriverFactory.BuildDriver();
-var kernel = KernelFactory.BuildKernel(driver);
+var driverPlugin = await DriverPlugin.FromDriverAsync(driver);
+
+var kernel = KernelFactory.BuildKernel(driverPlugin);
 var chatService = kernel.GetRequiredService<IChatCompletionService>();
 var promptSettings = new OpenAIPromptExecutionSettings
 {

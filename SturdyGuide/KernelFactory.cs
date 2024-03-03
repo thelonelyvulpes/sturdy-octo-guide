@@ -1,15 +1,14 @@
 using Microsoft.SemanticKernel;
-using Neo4j.Driver;
 
 namespace SturdyGuide;
 
 internal sealed class KernelFactory
 {
-    internal static Kernel BuildKernel(IDriver driver)
+    internal static Kernel BuildKernel(params object[] plugins)
     {
         var builder = Kernel.CreateBuilder();
         builder.AddOpenAIChatCompletion(Config.ModelName, Config.ApiKey);
-        builder.Plugins.AddFromObject(new DriverPlugin(driver));
+        foreach (var plugin in plugins) builder.Plugins.AddFromObject(plugin);
         return builder.Build();
     }
 }

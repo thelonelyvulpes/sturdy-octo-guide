@@ -1,19 +1,45 @@
-using System.ComponentModel;
+using System.Collections.Frozen;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.SemanticKernel;
 using Neo4j.Driver;
-using System.Text.Json;
 
 namespace SturdyGuide;
 
-public class DriverPlugin(IDriver driver)
+public sealed class DriverPlugin : KernelPlugin
 {
-    [KernelFunction]
-    [Description("queries the neo4j database with cypher")]
-    public async Task<string> QueryDb(string query, bool writeMode)
+    private const string driverPluginDescription = "";
+    private readonly IReadOnlyList<KernelFunction> _functions;
+    private readonly FrozenDictionary<string, KernelFunction> _kernelFunctionDictionary;
+
+    private DriverPlugin(IReadOnlyList<KernelFunction> functions)
+        : base(nameof(DriverPlugin), driverPluginDescription)
     {
-        var result = await driver.ExecutableQuery(query)
-            .WithConfig(new QueryConfig(writeMode ? RoutingControl.Writers : RoutingControl.Readers, "neo4j"))
-            .ExecuteAsync();
-        return JsonSerializer.Serialize(result);
+        _functions = functions;
+        _kernelFunctionDictionary = _functions.ToFrozenDictionary(x => x.Name, x => x);
+    }
+
+    public override int FunctionCount => _functions.Count;
+
+    public override bool TryGetFunction(string name, [UnscopedRef] out KernelFunction? function)
+    {
+        return _kernelFunctionDictionary.TryGetValue(name, out function);
+    }
+
+    public override IEnumerator<KernelFunction> GetEnumerator()
+    {
+        return _functions.GetEnumerator();
+    }
+
+    /// <summary>
+    ///     Creates the plugin configured to run against a driver instance.
+    /// </summary>
+    /// <param name="driver">The neo4j driver.</param>
+    /// <returns>a new plugin that runs against the <paramref name="driver" />.</returns>
+    public static async ValueTask<DriverPlugin> FromDriverAsync(IDriver driver)
+    {
+        await driver.VerifyConnectivityAsync();
+        var functions = await DriverKernelFunctionFactory.BuildAsync(driver);
+        var plugin = new DriverPlugin(functions);
+        return plugin;
     }
 }
