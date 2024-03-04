@@ -15,7 +15,7 @@ internal static class DriverKernelFunctionFactory
             (string query, bool writeMode) => QueryDb(driver, query, writeMode), "queryNeo4jDatabase",
             "queries the neo4j database",
             new KernelParameterMetadata[]
-                { new("query"), new("writeMode") { Description = "if the query could modify a value" } }));
+                { new("query"), new("writeMode") { Description = "true if the query could modify a value" } }));
 
         return ValueTask.FromResult((IReadOnlyList<KernelFunction>)functions);
     }

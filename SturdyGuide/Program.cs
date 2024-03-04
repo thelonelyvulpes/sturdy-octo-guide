@@ -1,11 +1,13 @@
-﻿using Microsoft.SemanticKernel.ChatCompletion;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using SturdyGuide;
 
-await using var driver = DriverFactory.BuildDriver();
+using var loggerFactory = LoggerFactory.Create(x => x.AddConsole().SetMinimumLevel(LogLevel.Debug));
+await using var driver = DriverFactory.BuildDriver(loggerFactory);
 var driverPlugin = await DriverPlugin.FromDriverAsync(driver);
 
-var kernel = KernelFactory.BuildKernel(driverPlugin);
+var kernel = KernelFactory.BuildKernel(loggerFactory, driverPlugin.Add);
 var chatService = kernel.GetRequiredService<IChatCompletionService>();
 var promptSettings = new OpenAIPromptExecutionSettings
 {
