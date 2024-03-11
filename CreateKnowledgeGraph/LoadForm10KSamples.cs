@@ -1,27 +1,17 @@
-﻿
-namespace CreateKnowledgeGraph
+﻿namespace CreateKnowledgeGraph;
+
+public static class LoadForm10KSamples
 {
-  using System;
-  using System.Text.Json;
-  using System.Text.Json.Serialization;
-  using System.Text.RegularExpressions;
-    public class LoadForm10KSamples
-  {
-    public static List<EdgarForm10K> Load()
+    public static async Task<List<EdgarForm10K>> LoadAsync()
     {
-      List<EdgarForm10K> form10Ks = new List<EdgarForm10K>();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "data", "single", "form10k",
+            "0000950170-23-027948.json");
 
-      string filePath = Path.Combine(Directory.GetCurrentDirectory(), "data", "single", "form10k", "0000950170-23-027948.json");
+        var singleForm = await EdgarForm10K.LoadAsync(filePath);
+        
+        if (singleForm != null)
+            return [singleForm];
 
-      EdgarForm10K? singleForm = EdgarForm10K.Load(filePath);
-
-      if (singleForm != null)
-      {
-        form10Ks.Add(singleForm);
-      }
-
-      return form10Ks;
-
+        return [];
     }
-  }
 }

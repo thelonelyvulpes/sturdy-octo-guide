@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 
-namespace SturdyGuide;
+namespace CreateKnowledgeGraph;
 
 internal sealed class Config
 {
@@ -16,7 +16,6 @@ internal sealed class Config
     }
 
     public static string DataCollection => ConfigValues.Value["DataCollection"] ??
-                                      throw new InvalidOperationException("'DataCollection' missing from appsettings");
-
-
+                                           throw new InvalidOperationException(
+                                               "'DataCollection' missing from appsettings");
 }

@@ -1,78 +1,67 @@
-﻿
-namespace CreateKnowledgeGraph
+﻿using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+
+namespace CreateKnowledgeGraph;
+
+public sealed class EdgarForm10K
 {
-  using System;
-  using System.Text.Json;
-  using System.Text.Json.Serialization;
-  using System.Text.RegularExpressions;
+    [JsonPropertyName("item1")] public string Item1 { get; set; }
 
-  public partial class EdgarForm10K
-  {
-    [JsonPropertyName("item1")]
-    public string Item1 { get; set; }
+    [JsonPropertyName("item1a")] public string Item1A { get; set; }
 
-    [JsonPropertyName("item1a")]
-    public string Item1A { get; set; }
+    [JsonPropertyName("item7")] public string Item7 { get; set; }
 
-    [JsonPropertyName("item7")]
-    public string Item7 { get; set; }
+    [JsonPropertyName("item7a")] public string Item7A { get; set; }
 
-    [JsonPropertyName("item7a")]
-    public string Item7A { get; set; }
+    [JsonPropertyName("cik")] public string Cik { get; set; }
 
-    [JsonPropertyName("cik")]
-    public string Cik { get; set; }
+    [JsonPropertyName("cusip6")] public string Cusip6 { get; set; }
 
-    [JsonPropertyName("cusip6")]
-    public string Cusip6 { get; set; }
+    [JsonPropertyName("cusip")] public string[]? Cusip { get; set; }
 
-    [JsonPropertyName("cusip")]
-    public string[] Cusip { get; set; }
+    [JsonPropertyName("names")] public string[]? Names { get; set; }
 
-    [JsonPropertyName("names")]
-    public string[] Names { get; set; }
-
-    [JsonPropertyName("source")]
-    public Uri Source { get; set; }
+    [JsonPropertyName("source")] public Uri Source { get; set; }
 
     private string SampleText(string text)
     {
-      string sampleText = (text != null) ? text.Substring(0, Math.Min(text.Length, 80)) : "";
-      return Regex.Replace(sampleText, @"\s+", " ");
+        var sampleText = text != null ? text.Substring(0, Math.Min(text.Length, 80)) : "";
+        return Regex.Replace(sampleText, @"\s+", " ");
     }
 
-    private string ArrayToString(string[] array)
+    private string ArrayToString(string[]? array)
     {
-      return (array != null) ? string.Join(", ", array) : "";
+        return array != null ? string.Join(", ", array) : "";
     }
 
-    public void Show()
+    public override string ToString()
     {
-      Console.WriteLine($"Names: {ArrayToString(Names)}");
-      Console.WriteLine($"Source: {Source}");
-      Console.WriteLine($"Item1: {SampleText(Item1)}");
-      Console.WriteLine($"Item1A: {SampleText(Item1A)}");
-      Console.WriteLine($"Item7: {SampleText(Item7)}");
-      Console.WriteLine($"Item7A: {SampleText(Item7A)}");
-      Console.WriteLine($"Cik: {Cik}");
-      Console.WriteLine($"Cusip6: {Cusip6}");
-      Console.WriteLine($"Cusip: {ArrayToString(Cusip)}");
+        var sb = new StringBuilder();
+        sb.Append("Form 10-K: ")
+            .AppendLine(Source.ToString());
+        sb.Append(nameof(Names)).Append(": ").AppendLine(ArrayToString(Names));
+        AppendSampledPropertyToStringBuilder(sb, Item1);
+        AppendSampledPropertyToStringBuilder(sb, Item1A);
+        AppendSampledPropertyToStringBuilder(sb, Item7);
+        AppendSampledPropertyToStringBuilder(sb, Item7A);
+        sb.Append(nameof(Cik)).Append(": ").AppendLine(Cik);
+        sb.Append(nameof(Cusip6)).Append(": ").AppendLine(Cusip6);
+        sb.Append(nameof(Cusip)).Append(": ").AppendLine(ArrayToString(Cusip));
+        return sb.ToString();
     }
-  }
 
-
-  public partial class EdgarForm10K
-  {
-    public static EdgarForm10K? Load(string filePath)
+    private void AppendSampledPropertyToStringBuilder(StringBuilder sb, string s,
+        [CallerArgumentExpression("s")] string? parameterName = default)
     {
-      using (StreamReader r = new StreamReader(filePath))
-      {
-        string json = r.ReadToEnd();
-        
-        return JsonSerializer.Deserialize<EdgarForm10K>(json);
-      }
-
+        sb.Append(parameterName).Append(": ").AppendLine(SampleText(s));
     }
-  }
 
+    public static async Task<EdgarForm10K?> LoadAsync(string filePath)
+    {
+        await using var fs = new FileStream(filePath, FileMode.Open);
+        return await JsonSerializer.DeserializeAsync<EdgarForm10K>(fs);
+    }
 }

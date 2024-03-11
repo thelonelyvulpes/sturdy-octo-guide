@@ -1,18 +1,12 @@
-﻿
-namespace CreateKnowledgeGraph
+﻿namespace CreateKnowledgeGraph;
+
+public static class SingleFile
 {
-  using System;
-  using System.Text.Json;
-  using System.Text.Json.Serialization;
-  using System.Text.RegularExpressions;
-    public class SingleFile
-  {
-    public static EdgarForm10K? Load()
+    public static Task<EdgarForm10K?> Load()
     {
-      string filePath = Path.Combine(Directory.GetCurrentDirectory(), "data", "single", "form10k", "0000950170-23-027948.json");
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "data", "single", "form10k",
+            "0000950170-23-027948.json");
 
-      return EdgarForm10K.Load(filePath);
-
+        return EdgarForm10K.LoadAsync(filePath);
     }
-  }
 }
